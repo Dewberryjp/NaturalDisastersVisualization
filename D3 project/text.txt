@@ -1,0 +1,10 @@
+Read in csv file
+dict = dictionary()
+for x in csv:
+    if x.year is key in dict:
+        dict[x.year] += 1
+    else:
+        dict[x.year] = 1
+
+[k] = 2
+
