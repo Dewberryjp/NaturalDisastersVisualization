@@ -1,11 +1,13 @@
-d3.json('barChartData.json')
+d3.json('finallinedata.json')
     .then(d=>{
-        var data = []
-        for (x in d){
+       var getCO2=function(country){
+            var data = [[],[],[]]
+        Object.entries(d).forEach(([key, e]) =>{
+                console.log(e);
+            }
 
-            data.push([+x,Object.values(d[x]).reduce((a,b) => a + b)])
-        }
-        console.log(data)
+        )}
+        getCO2()
 var svg = d3.select("svg")
         ,margin = 200
         ,width = svg.attr("width")-margin
@@ -13,9 +15,12 @@ var svg = d3.select("svg")
 var xScale = d3.scaleLinear()
 .domain([1960, 2020])
 .range([0, width]),
-yScale = d3.scaleLinear()
+disyScale = d3.scaleLinear()
 .domain([0, 1846])
 .range([height, 0]);
+co2yScale = d3.scaleLinear()
+.domain([])
+.range([]);
 var g = svg.append('g')
 .attr("transform", "translate(" +100 + "," + 100 + ")");
 //Title Text
@@ -41,12 +46,24 @@ svg.append('text')
 .style('font-family', 'sans-serif')
 .style('font-size', 14)
 .text('Amount of Disasters')
+//Adds 2nd yAxis label
+svg.append('text')
+.attr('text-anchor', 'middle')
+.attr('transform','translate(950,'+height/1.5 + ')rotate(-270)')
+.style('font-family', 'sans-serif')
+.style('font-size', 14)
+.text('Tons of CO2 Emitted')
+
 //Adds Axis's
 g.append('g')
 .attr('transform', 'translate (0,'+height+ ')')
 .call(d3.axisBottom(xScale));
 g.append('g')
-.call(d3.axisLeft(yScale));
+.call(d3.axisLeft(disyScale));
+g.append('g')
+.attr('transform','translate(800,'+0+ ')')
+.call(d3.axisRight(co2yScale));
+
 //adding circles for given data
 svg.append('g').selectAll("dot")
 .data(data)
@@ -56,7 +73,7 @@ svg.append('g').selectAll("dot")
     return xScale(d[0]);
 })
 .attr('cy', function(d){
-    return yScale(d[1]);
+    return disyScale(d[1]);
 })
 .attr('r', 3)
 .attr('transform', "translate (" + 100 + "," + 100 + ")")
@@ -67,7 +84,7 @@ var line = d3.line()
     return xScale(d[0]);
 })
 .y(function(d){
-    return yScale(d[1]);
+    return disyScale(d[1]);
 })
 .curve(d3.curveMonotoneX)
 svg.append('path')
