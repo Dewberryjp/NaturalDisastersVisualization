@@ -1,13 +1,34 @@
+mapData = new Map()
 d3.json('finallinedata.json')
     .then(d=>{
-       var getCO2=function(country){
-            var data = [[],[],[]]
+       
         Object.entries(d).forEach(([key, e]) =>{
-                console.log(e);
-            }
+                mapData.set(key,[])
+            Object.entries(e).forEach(([key2, e2]) =>{
+                if (key2 == "id") return;
+                if(!('co2' in e2)){
+                    e2.co2 = 0
+                }
+                if(!('total' in e2)){
+                    e2.total = 0
+                }
+                mapData.get(key).push({year: key2, co2: e2.co2, total: e2.total})
+            
 
-        )}
-        getCO2()
+            })
+
+    })
+    console.log(mapData);
+
+    var dataset = mapData.get('MYA')
+
+    function printData(dataset){
+        dataset.forEach(element => {
+            console.log(element.year, element.co2, element.total)
+        })
+    }
+    printData(dataset)
+
 var svg = d3.select("svg")
         ,margin = 200
         ,width = svg.attr("width")-margin
@@ -16,7 +37,7 @@ var xScale = d3.scaleLinear()
 .domain([1960, 2020])
 .range([0, width]),
 disyScale = d3.scaleLinear()
-.domain([0, 50])
+.domain([0, 1000])
 .range([height, 0]);
 co2yScale = d3.scaleLinear()
 .domain([0,3000])
@@ -66,14 +87,14 @@ g.append('g')
 
 //adding circles for given data
 svg.append('g').selectAll("dot")
-.data(data)
+.data(dataset)
 .enter()
 .append('circle')
 .attr('cx', function (d){
     return xScale(d[0]);
 })
 .attr('cy', function(d){
-    return disyScale(d[1]);
+    return disyScale(d[2]);
 })
 .attr('r', 3)
 .attr('transform', "translate (" + 100 + "," + 100 + ")")
@@ -88,7 +109,7 @@ var line = d3.line()
 })
 .curve(d3.curveMonotoneX)
 svg.append('path')
-.datum(data)
+.datum(dataset)
 .attr('class', 'line')
 .attr('transform', 'translate(' + 100 +',' + 100 + ")")
 .attr('d', line)
